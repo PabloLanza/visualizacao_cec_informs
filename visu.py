@@ -1,5 +1,4 @@
 import streamlit as st
-import plotly_express as px
 import pandas as pd
 
 
@@ -104,5 +103,6 @@ if len(mando_sel) == 1:
     mando_sel = mando_sel + ('',)
 
 df = gols(competicoes=competicao_sel, mando=mando_sel)
+
 
 st.table(df)
