@@ -1,3 +1,18 @@
+def filtro_comp_mando(c, m):
+    if len(c) < 1:
+        competicoes = ['Mineiro', 'Sul Americana', 'Brasileiro', 'Copa do Brasil']
+    else:
+        competicoes = c
+
+    
+    if len(m) < 1:
+        mando = ['Casa', 'Fora']
+    else:
+        mando = m
+
+    return competicoes, mando
+
+
 def gols(competicoes=[], mando=[]):
 
     import pandas as pd
@@ -51,19 +66,6 @@ def gols(competicoes=[], mando=[]):
     return gols.sort_values(by=("gols"), ascending=False)
 
 
-def filtro_comp_mando(c, m):
-    if len(c) < 1:
-        competicoes = ['Mineiro', 'Sul Americana', 'Brasileiro', 'Copa do Brasil']
-    else:
-        competicoes = c
-
-    
-    if len(m) < 1:
-        mando = ['Casa', 'Fora']
-    else:
-        mando = m
-
-    return competicoes, mando
 
 
 
@@ -75,9 +77,6 @@ def assistencias(competicoes=[], mando=[]):
     #TABELAS QUE SERÃO USADAS
     df_escalacao = pd.read_excel("escalacoes.xlsx")
     df_jogos = pd.read_excel("jogos.xlsx")
-
-    #CRIANDO UM FILTRO NOS FILTROS
-    competicoes, mando = filtro_comp_mando(c=competicoes, m=mando)
 
     #FAZENDO A JUNÇÃO DOS DFs
     df_ass = pd.merge(df_escalacao[["id_jogo", "assistencias"]], df_jogos[["id_jogo", "competicao", "mando"]], on="id_jogo", how="inner")
@@ -126,20 +125,63 @@ def assistencias(competicoes=[], mando=[]):
     return ass.sort_values(by=("assistencias"), ascending=False)
 
 
-def filtro_comp_mando(c, m):
-    if len(c) < 1:
-        competicoes = ['Mineiro', 'Sul Americana', 'Brasileiro', 'Copa do Brasil']
-    else:
-        competicoes = c
-
-    
-    if len(m) < 1:
-        mando = ['Casa', 'Fora']
-    else:
-        mando = m
-
-    return competicoes, mando
-
 
 df = assistencias(competicoes=["Brasileiro", "Copa do Brasil"], mando=["Casa", "Fora"])
 print(df)
+
+
+def dobradinha(competicoes=[], mando=[]):
+    import pandas as pd
+
+
+    #TABELAS QUE SERÃO USADAS
+    df_escalacao = pd.read_excel("escalacoes.xlsx")
+    df_jogos = pd.read_excel("jogos.xlsx")
+
+    #JUNÇÃO DOS DFs
+    df_gol_ass = pd.merge(df_escalacao[["id_jogo", "autor_gols_pro", "assistencias"]], df_jogos[["id_jogo", "competicao", "mando"]])
+
+    #REMOVENDO ESPAÇOS ANTES E DEPOIS DOS NOMES
+    for col in df_gol_ass.select_dtypes(include=["object", "string"]):
+        df_gol_ass[col] = df_gol_ass[col].str.strip()
+
+    #CRIANDO UM FILTRO NOS FILTROS
+    competicoes, mando = filtro_comp_mando(c=competicoes, m=mando)
+    df_gol_ass = df_gol_ass[(df_gol_ass["competicao"].isin(competicoes)) & (df_gol_ass["mando"].isin(mando))]
+
+    #REMOVENDO COLUNAS QUE NÃO SERÃO USADAS
+    df_gol_ass = df_gol_ass[["autor_gols_pro", "assistencias"]]
+
+    #REMOVENDO VALORES NULOS
+    df_gol_ass = df_gol_ass.dropna()
+
+    #QUEBRA AS COLUNAS EM LISTAS
+    df_gol_ass["autor_gols_pro"] = df_gol_ass["autor_gols_pro"].str.split(', ')
+    df_gol_ass["assistencias"] = df_gol_ass["assistencias"].str.split(', ')
+
+    #CONCATENA CADA LISTA EM UMA LISTA APENAS
+    lista_gol = sum(df_gol_ass["autor_gols_pro"], [])
+    lista_ass = sum(df_gol_ass["assistencias"], [])
+
+    #COLOCA TODOS OS JOGADORES EM LETRAS MAIUSCULAS
+    lista_gol = [item.upper() for item in lista_gol]
+    lista_ass = [item.upper() for item in lista_ass]
+
+    #PREPARA OS DADOS PRA FAZER O DATA FRAME
+    dados = {
+        "gols": lista_gol,
+        "assistencias": lista_ass
+    }
+
+    #CRIA O DATA FRAME
+    df_dobradinha = pd.DataFrame(dados)
+
+    #INDICA QUE NÃO IMPORTA A ORDEM DA DUPLA (A + B) OU (B + A)
+    df_dobradinha["dupla"] = df_dobradinha.apply(lambda x: tuple(sorted([x["gols"], x["assistencias"]])), axis=1)
+
+    #FAZ A CONTAGEM DE QUANTAS VEZES CADA DUPLA APARECEU
+    contagem_duplas = df_dobradinha["dupla"].value_counts().reset_index()
+    contagem_duplas.columns = ["dupla", "quantidade"]
+    contagem_duplas = contagem_duplas[contagem_duplas["dupla"].apply(lambda x: all(v not in ["NONE", "PÊNALTI", "FALTA"] for v in x))]
+
+    return contagem_duplas.sort_values(by="quantidade", ascending=False)

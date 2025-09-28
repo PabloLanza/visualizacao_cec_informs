@@ -19,3 +19,10 @@ st.title("Ranking de Assistências")
 df_ass = func.assistencias(competicoes=competicao_sel, mando=mando_sel)
 
 st.table(df_ass)
+
+st.title("Ranking de Dobradinhas")
+st.write("Dobradinha é quando um jogador x da assistencias pra um jogador y fazer o gol ou vice-versa")
+
+df_dobradinha = func.dobradinha(competicoes=competicao_sel, mando=mando_sel)
+
+st.table(df_dobradinha)
