@@ -127,6 +127,7 @@ def assistencias(competicoes=[], mando=[]):
 
 
 
+
 def dobradinha(competicoes=[], mando=[]):
     import pandas as pd
 
@@ -181,7 +182,10 @@ def dobradinha(competicoes=[], mando=[]):
     contagem_duplas.columns = ["dupla", "quantidade"]
     contagem_duplas = contagem_duplas[contagem_duplas["dupla"].apply(lambda x: all(v not in ["NONE", "PÊNALTI", "FALTA"] for v in x))]
 
+    #TRANFORMAR AS TUPLAS EM STRINGS
+    contagem_duplas["dupla"] = contagem_duplas["dupla"].apply(lambda x: " - ".join(map(str, x)))
+
     return contagem_duplas.sort_values(by="quantidade", ascending=False)
 
-
-
+df = dobradinha()
+print(df)
