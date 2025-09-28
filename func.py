@@ -126,9 +126,6 @@ def assistencias(competicoes=[], mando=[]):
 
 
 
-df = assistencias(competicoes=["Brasileiro", "Copa do Brasil"], mando=["Casa", "Fora"])
-print(df)
-
 
 def dobradinha(competicoes=[], mando=[]):
     import pandas as pd
@@ -185,3 +182,6 @@ def dobradinha(competicoes=[], mando=[]):
     contagem_duplas = contagem_duplas[contagem_duplas["dupla"].apply(lambda x: all(v not in ["NONE", "PÊNALTI", "FALTA"] for v in x))]
 
     return contagem_duplas.sort_values(by="quantidade", ascending=False)
+
+
+
