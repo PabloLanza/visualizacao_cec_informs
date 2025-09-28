@@ -1,6 +1,7 @@
 def gols(competicoes=[], mando=[]):
 
     import pandas as pd
+    import openpyxl
 
     #TABELAS QUE SERÃO USADAS
     df_escalacao = pd.read_excel("escalacoes.xlsx")
@@ -64,4 +65,5 @@ def filtro_comp_mando(c, m):
 
 
 df = gols(competicoes=["Brasileiro", "Copa do Brasil"], mando=["Casa", "Fora"])
+
 print(df)
