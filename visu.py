@@ -72,7 +72,8 @@ competicao_sel = st.multiselect("Selecione as Competições: ", ['Mineiro', 'Sul
 mando_sel = st.multiselect("Selecione os Mandos: ", ['Casa', 'Fora'])
 
 
-df = func.gols(competicoes=competicao_sel, mando=mando_sel)
+df = gols(competicoes=competicao_sel, mando=mando_sel)
 
 
 st.table(df)
+
