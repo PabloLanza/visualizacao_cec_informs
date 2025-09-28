@@ -2,6 +2,7 @@ def gols(competicoes=[], mando=[]):
 
     import pandas as pd
 
+
     #TABELAS QUE SERÃO USADAS
     df_escalacao = pd.read_excel("escalacoes.xlsx")
     df_jogos = pd.read_excel("jogos.xlsx")
@@ -43,7 +44,8 @@ def gols(competicoes=[], mando=[]):
     #CONTAGEM DE GOLS
     gols = df_resumo_gols["gols"].value_counts().reset_index()
 
-    gols = gols.rename(columns={'index': 'jogador'})
+    gols = gols.rename(columns={'gols': 'jogador'})
+    gols = gols.rename(columns={'count': 'gols'})
 
     return gols.sort_values("gols", ascending=False)
 
