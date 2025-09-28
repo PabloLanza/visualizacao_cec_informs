@@ -9,10 +9,10 @@ st.markdown("""
                 }
             
                 div[data-baseweb="tag"] {
-                background-color: darkblue !important;
-                color: white !important;
-                border-radius: 8px;
-                padding: 5px;
+                    background-color: darkblue !important;
+                    color: white !important;
+                    border-radius: 8px;
+                    padding: 5px;
                 }
                 <style>""", unsafe_allow_html=True)
 
