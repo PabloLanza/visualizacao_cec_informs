@@ -3,7 +3,7 @@ import streamlit as st
 def gols(competicoes=[], mando=[]):
 
     import pandas as pd
-    import openpyxl
+
 
     #TABELAS QUE SERÃO USADAS
     df_escalacao = pd.read_excel("escalacoes.xlsx")
@@ -76,4 +76,5 @@ df = gols(competicoes=competicao_sel, mando=mando_sel)
 
 
 st.table(df)
+
 
