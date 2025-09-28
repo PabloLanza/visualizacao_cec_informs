@@ -46,7 +46,8 @@ def gols(competicoes=[], mando=[]):
     #CONTAGEM DE GOLS
     gols = df_resumo_gols["gols"].value_counts().reset_index()
 
-    gols = gols.rename(columns={'index': 'jogador'})
+    gols = gols.rename(columns={'gols': 'jogador'})
+    gols = gols.rename(columns={'count': 'gols'})
 
     return gols.sort_values("gols", ascending=False)
 
@@ -77,6 +78,7 @@ df = df.sort_values(by="gols", ascending=False)
 
 
 st.table(df)
+
 
 
 
