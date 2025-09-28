@@ -7,6 +7,13 @@ st.markdown("""
                 h1 {color: darkblue !important;
                     text_align: center;
                 }
+            
+                div[data-baseweb="tag"] {
+                background-color: darkblue !important;
+                color: white !important;
+                border-radius: 8px;
+                padding: 5px;
+                }
                 <style>""", unsafe_allow_html=True)
 
 st.title("PAINEL INTERATIVO CEC INFORMS")
