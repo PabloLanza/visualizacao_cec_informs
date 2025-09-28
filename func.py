@@ -212,8 +212,11 @@ def participacoes(competicoes=[], mando=[]):
     df_participacoes = df_participacoes[~df_participacoes["jogador"].isin(["NONE", "PÊNALTI", "FALTA"])]
 
     return df_participacoes.sort_values(by="participacoes", ascending=False)    
+
+
     
     
+
 
 
     
