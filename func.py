@@ -137,7 +137,7 @@ def dobradinha(competicoes=[], mando=[]):
     df_jogos = pd.read_excel("jogos.xlsx")
 
     #JUNÇÃO DOS DFs
-    df_gol_ass = pd.merge(df_escalacao[["id_jogo", "autor_gols_pro", "assistencias"]], df_jogos[["id_jogo", "competicao", "mando"]])
+    df_gol_ass = pd.merge(df_escalacao[["id_jogo", "autor_gols_pro", "assistencias"]], df_jogos[["id_jogo", "competicao", "mando"]], on="id_jogo", how="inner")
 
     #REMOVENDO ESPAÇOS ANTES E DEPOIS DOS NOMES
     for col in df_gol_ass.select_dtypes(include=["object", "string"]):
@@ -180,6 +180,8 @@ def dobradinha(competicoes=[], mando=[]):
     #FAZ A CONTAGEM DE QUANTAS VEZES CADA DUPLA APARECEU
     contagem_duplas = df_dobradinha["dupla"].value_counts().reset_index()
     contagem_duplas.columns = ["dupla", "quantidade"]
+
+    #REMOVENDO DADOS NÃO COERENTES
     contagem_duplas = contagem_duplas[contagem_duplas["dupla"].apply(lambda x: all(v not in ["NONE", "PÊNALTI", "FALTA"] for v in x))]
 
     #TRANFORMAR AS TUPLAS EM STRINGS
@@ -187,5 +189,31 @@ def dobradinha(competicoes=[], mando=[]):
 
     return contagem_duplas.sort_values(by="quantidade", ascending=False)
 
-df = dobradinha()
-print(df)
+
+def participacoes(competicoes=[], mando=[]):
+    import pandas as pd
+
+    df_gols = gols(competicoes=competicoes, mando=mando)
+    df_ass = assistencias(competicoes=competicoes, mando=mando)
+
+    df_participacoes = pd.merge(df_gols, df_ass, on="jogador", how="outer")
+
+    #PREENCHER VALORES AUSENTES COM 0
+    df_participacoes = df_participacoes.fillna(0)
+
+    #CALCULA AS PARTICIPACOES (GOLS + ASSISTENCIAS)
+    df_participacoes["participacoes"] = df_participacoes["gols"] + df_participacoes["assistencias"]
+
+    #TRANSFORMANDOAS COLUNAS FLOAT DO DF PRO TIPO INT
+    for c in df_participacoes.select_dtypes(include="float"):
+        df_participacoes[c] = df_participacoes[c].astype(int)
+    
+    #REMOVENDO DADOS NÃO COERENTES
+    df_participacoes = df_participacoes[~df_participacoes["jogador"].isin(["NONE", "PÊNALTI", "FALTA"])]
+
+    return df_participacoes.sort_values(by="participacoes", ascending=False)    
+    
+    
+
+
+    
