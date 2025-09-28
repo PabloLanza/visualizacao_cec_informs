@@ -4,13 +4,18 @@ import func
 
 
 
-
-st.title("Painel de Artilheiros")
-
 competicao_sel = st.multiselect("Selecione as Competições: ", ['Mineiro', 'Sul Americana', 'Brasileiro', 'Copa do Brasil', ''])
 mando_sel = st.multiselect("Selecione os Mandos: ", ['Casa', 'Fora'])
 
 
-df = func.gols(competicoes=competicao_sel, mando=mando_sel)
+st.title("Ranking de Artilheiros")
 
-st.table(df)
+df_gols = func.gols(competicoes=competicao_sel, mando=mando_sel)
+
+st.table(df_gols)
+
+st.title("Ranking de Assistências")
+
+df_ass = func.assistencias(competicoes=competicao_sel, mando=mando_sel)
+
+st.table(df_ass)
