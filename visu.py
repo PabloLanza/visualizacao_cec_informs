@@ -73,8 +73,10 @@ mando_sel = st.multiselect("Selecione os Mandos: ", ['Casa', 'Fora'])
 
 
 df = gols(competicoes=competicao_sel, mando=mando_sel)
+df = df.sort_values(by="gols", ascending=False)
 
 
 st.table(df)
+
 
 
