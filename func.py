@@ -244,17 +244,18 @@ def perfil_finalizacoes(competicoes=[], mando=[]):
     valores1 = df_chutes_sum.loc[["chutes_area_cruzeiro", "chutes_fora_area_cruzeiro"], "soma"]
     valores2 = df_chutes_sum.loc[["chutes_area_adv", "chutes_fora_area_adv"], "soma"]
 
-    fig1, ax1 = plt.subplots(1, 2, figsize=(12, 7))
-    ax1[0].pie(valores1, 
+    fig1, ax1 = plt.subplot()
+    ax1.pie(valores1, 
             labels=["Dentro da Área", "Fora da Área"], autopct="%.1f%%", startangle=90, colors=["#427ef5", "#f5ba67"])
-    ax1[0].set_title("Perfil das Finalizações do Cruzeiro", color="#427ef5", fontweight="bold", fontsize=14)
+    ax1.set_title("Perfil das Finalizações do Cruzeiro", color="#427ef5", fontweight="bold", fontsize=14)
 
-    ax1[1].pie(valores2,
+    fig2, ax2 = plt.subplot()
+    ax2.pie(valores2,
             labels=["Dentro da Área", "Fora da Área"], autopct="%.1f%%", startangle=90, colors=["#427ef5", "#f5ba67"])
-    ax1[1].set_title("Perfil das Finalizações do Adversário", color="#427ef5", fontweight="bold", fontsize=14)
+    ax2.set_title("Perfil das Finalizações do Adversário", color="#427ef5", fontweight="bold", fontsize=14)
     plt.tight_layout()
 
-    return fig1
+    return fig1, fig2
     
 
 

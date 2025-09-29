@@ -14,5 +14,7 @@ st.title("PAINEL INTERATIVO CEC INFORMS")
 competicao_sel = st.multiselect("Selecione as Competições: ", ['Mineiro', 'Sul Americana', 'Brasileiro', 'Copa do Brasil', ''])
 mando_sel = st.multiselect("Selecione os Mandos: ", ['Casa', 'Fora'])
 
-fig = func.perfil_finalizacoes(competicoes=competicao_sel, mando=mando_sel)
-st.pyplot(fig)
+fig1, fig2 = func.perfil_finalizacoes(competicoes=competicao_sel, mando=mando_sel)
+st.pyplot(fig1)
+
+st.pyplot(fig2)
