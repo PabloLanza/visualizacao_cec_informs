@@ -300,8 +300,10 @@ def passes_trocados(competicoes=[], mando=[]):
     ax1.plot(x, passes_cruzeiro, label="Passes Cruzeiro", marker="o", color="darkblue")
     ax1.plot(x, passes_adv, label="Passes Adversário", marker="o", color="lightblue")
 
-    ax1.set_title("Passes Trocados Por Jogo")
+    ax1.set_title("Passes Trocados Por Jogo", fontsize=16)
     ax1.legend()
+    ax1.set_xlabel("Jogos")
+    ax1.set_ylabel("Passes")
     ax1.grid(True)
 
     fig2, ax2 = plt.subplots(figsize=(10,5))
@@ -309,8 +311,10 @@ def passes_trocados(competicoes=[], mando=[]):
     ax2.plot(x, passes_certos_cruzeiro, label="Passes Certos Cruzeiro", marker="o", color="darkblue")
     ax2.plot(x, passes_certos_adv, label="Passes Certos Adversários", marker="o", color="lightblue")
 
-    ax2.set_title("Passes Certos Por Jogo")
+    ax2.set_title("Passes Certos Por Jogo", fontsize=16)
     ax2.legend()
+    ax2.set_xlabel("Jogos")
+    ax2.set_ylabel("Passes")
     ax2.grid(True)
 
     return fig1, fig2
