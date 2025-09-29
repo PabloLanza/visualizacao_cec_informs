@@ -237,25 +237,43 @@ def perfil_finalizacoes(competicoes=[], mando=[]):
     df_chutes_sum = df_chutes[["chutes_cruzeiro", "chutes_adv", "chutes_gol_cruzeiro", "chutes_gol_adv", "chutes_area_cruzeiro", "chutes_area_adv", "chutes_fora_area_cruzeiro", "chutes_fora_area_adv"]].sum().reset_index()
     df_chutes_sum.columns = ["stats", "soma"]
     df_chutes_sum["media"] = round(df_chutes_sum["soma"] / len(df_chutes), 0)
+    df_chutes_sum["chutes_nao_gol_cruzeiro"] = df_chutes_sum["chutes_cruzeiro"] - df_chutes_sum["chutes_gol_cruzeiro"]
+    df_chutes_sum["chutes_nao_gol_cruzeiro"] = df_chutes_sum["chutes_adv"] - df_chutes_sum["chutes_gol_adv"]
 
     df_chutes_sum = df_chutes_sum.set_index("stats")
 
     #GRAFICO PIZZA CHUTES DENTRO E FORA AREA
-    valores1 = df_chutes_sum.loc[["chutes_area_cruzeiro", "chutes_fora_area_cruzeiro"], "soma"]
-    valores2 = df_chutes_sum.loc[["chutes_area_adv", "chutes_fora_area_adv"], "soma"]
+    valores1 = df_chutes_sum[["chutes_nao_gol_cruzeiro", "chutes_gol_cruzeiro"], "soma"]
+    valores2 = df_chutes_sum[["chutes_nao_gol_adv", "chutes_gol_adv"]]
+    valores3 = df_chutes_sum.loc[["chutes_area_cruzeiro", "chutes_fora_area_cruzeiro"], "soma"]
+    valores4 = df_chutes_sum.loc[["chutes_area_adv", "chutes_fora_area_adv"], "soma"]
 
     fig1, ax1 = plt.subplots()
-    ax1.pie(valores1, 
-            labels=["Dentro da Área", "Fora da Área"], autopct="%.1f%%", startangle=90, colors=["#427ef5", "#f5ba67"])
-    ax1.set_title("Perfil das Finalizações do Cruzeiro", color="#427ef5", fontweight="bold", fontsize=14)
+    ax1.pie(valores1,
+            labels=["Chutes Sem Direção do Gol", "Chutes Ao Gol"], autopct="%.1f%%", startangle=90, colors=["#427ef5", "#f5ba67"],
+            wedgeprops={"width": 0.4})
+    ax1.set_title("Chutes Sem Direção x Chutes Ao Gol - Cruzeiro", color="#427ef5", fontweight="bold", fomtsize=14)
+    ax1.set_aspect("equal")
 
     fig2, ax2 = plt.subplots()
     ax2.pie(valores2,
+            labels=["Chutes Sem Direção do Gol", "Chutes Ao Gol"], autopct="%.1f%%", startangle=90, colors=["#427ef5", "#f5ba67"],
+            wedgeprops={"width": 0.4})
+    ax2.set_title("Chutes Sem Direção x Chutes Ao Gol - Adversário", color="#427ef5", fontweight="bold", fomtsize=14)
+    ax2.set_aspect("equal")
+
+    fig3, ax3 = plt.subplots()
+    ax3.pie(valores3, 
             labels=["Dentro da Área", "Fora da Área"], autopct="%.1f%%", startangle=90, colors=["#427ef5", "#f5ba67"])
-    ax2.set_title("Perfil das Finalizações do Adversário", color="#427ef5", fontweight="bold", fontsize=14)
+    ax3.set_title("Perfil das Finalizações do Cruzeiro", color="#427ef5", fontweight="bold", fontsize=14)
+
+    fig4, ax4 = plt.subplots()
+    ax4.pie(valores4,
+            labels=["Dentro da Área", "Fora da Área"], autopct="%.1f%%", startangle=90, colors=["#427ef5", "#f5ba67"])
+    ax4.set_title("Perfil das Finalizações do Adversário", color="#427ef5", fontweight="bold", fontsize=14)
     plt.tight_layout()
 
-    return fig1, fig2
+    return fig1, fig2, fig3, fig4
     
 
 
