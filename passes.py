@@ -9,7 +9,7 @@ st.markdown("""
                 }
                 <style>""", unsafe_allow_html=True)
 
-st.title("PAINEL INTERATIVO CEC INFORMS")
+st.title("CEC INFORMS - PAINEL DE PASSES")
 
 competicao_sel = st.multiselect("Selecione as Competições: ", ['Mineiro', 'Sul Americana', 'Brasileiro', 'Copa do Brasil', ''])
 mando_sel = st.multiselect("Selecione os Mandos: ", ['Casa', 'Fora'])
