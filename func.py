@@ -1,4 +1,4 @@
-def filtro_comp_mando(c, m):
+def filtro_comp_mando(c, m, df):
     if len(c) < 1:
         competicoes = ['Mineiro', 'Sul Americana', 'Brasileiro', 'Copa do Brasil']
     else:
@@ -10,8 +10,17 @@ def filtro_comp_mando(c, m):
     else:
         mando = m
 
-    return competicoes, mando
+    df = df[(df["competicao"].isin(competicoes)) & (df["mando"].isin(mando))]
 
+    return df
+
+
+def remover_espacos(df):
+    #REMOVENDO ESPAÇOS ANTES E DEPOIS DOS NOMES
+    for col in df.select_dtypes(include=["object", "string"]):
+        df[col] = df[col].str.strip()
+
+    return df
 
 def gols(competicoes=[], mando=[]):
 
@@ -26,13 +35,10 @@ def gols(competicoes=[], mando=[]):
     df_gols = pd.merge(df_escalacao[["id_jogo", "autor_gols_pro"]], df_jogos[["id_jogo", "competicao", "mando"]], on="id_jogo", how="inner")
     
     #REMOVENDO ESPAÇOS ANTES E DEPOIS DOS NOMES
-    for col in df_gols.select_dtypes(include=["object", "string"]):
-        df_gols[col] = df_gols[col].str.strip()
+    df_gols = remover_espacos(df=df_gols)
 
     #CRIANDO UM FILTRO NOS FILTROS
-    competicoes, mando = filtro_comp_mando(c=competicoes, m=mando)
-    df_gols = df_gols[(df_gols["competicao"].isin(competicoes)) & (df_gols["mando"].isin(mando))]
-    
+    df_gols = filtro_comp_mando(c=competicoes, m=mando, df=df_gols)    
     
     #REMOVE JOGOS SEM GOLS
     df_gols = df_gols.dropna()
@@ -66,9 +72,6 @@ def gols(competicoes=[], mando=[]):
     return gols.sort_values(by=("gols"), ascending=False)
 
 
-
-
-
 def assistencias(competicoes=[], mando=[]):
 
     import pandas as pd
@@ -82,18 +85,13 @@ def assistencias(competicoes=[], mando=[]):
     df_ass = pd.merge(df_escalacao[["id_jogo", "assistencias"]], df_jogos[["id_jogo", "competicao", "mando"]], on="id_jogo", how="inner")
     
     #REMOVENDO ESPAÇOS ANTES E DEPOIS DOS NOMES
-    for col in df_ass.select_dtypes(include=["object", "string"]):
-        df_ass[col] = df_ass[col].str.strip()
+    df_ass = remover_espacos(df=df_ass)
     
     #CRIANDO UM FILTRO NOS FILTROS
-    competicoes, mando = filtro_comp_mando(c=competicoes, m=mando)
-    df_ass = df_ass[(df_ass["competicao"].isin(competicoes)) & (df_ass["mando"].isin(mando))]
-
+    df_ass = filtro_comp_mando(c=competicoes, m=mando, df=df_ass)
 
     #REMOVE JOGOS SEM GOLS
     df_ass = df_ass.dropna()
-
-        
 
     #QUEBRA AS COLUNAS EM LISTAS
     df_ass["assistencias"] = df_ass["assistencias"].str.split(', ')
@@ -125,9 +123,6 @@ def assistencias(competicoes=[], mando=[]):
     return ass.sort_values(by=("assistencias"), ascending=False)
 
 
-
-
-
 def dobradinha(competicoes=[], mando=[]):
     import pandas as pd
 
@@ -140,12 +135,10 @@ def dobradinha(competicoes=[], mando=[]):
     df_gol_ass = pd.merge(df_escalacao[["id_jogo", "autor_gols_pro", "assistencias"]], df_jogos[["id_jogo", "competicao", "mando"]], on="id_jogo", how="inner")
 
     #REMOVENDO ESPAÇOS ANTES E DEPOIS DOS NOMES
-    for col in df_gol_ass.select_dtypes(include=["object", "string"]):
-        df_gol_ass[col] = df_gol_ass[col].str.strip()
+    df_gol_ass = remover_espacos(df=df_gol_ass)
 
     #CRIANDO UM FILTRO NOS FILTROS
-    competicoes, mando = filtro_comp_mando(c=competicoes, m=mando)
-    df_gol_ass = df_gol_ass[(df_gol_ass["competicao"].isin(competicoes)) & (df_gol_ass["mando"].isin(mando))]
+    df_gol_ass = filtro_comp_mando(c=competicoes, m=mando, df=df_gol_ass)
 
     #REMOVENDO COLUNAS QUE NÃO SERÃO USADAS
     df_gol_ass = df_gol_ass[["autor_gols_pro", "assistencias"]]
@@ -227,12 +220,10 @@ def perfil_finalizacoes(competicoes=[], mando=[]):
     df_chutes = pd.merge(df_jogos[["id_jogo", "competicao", "mando"]], df_ataque[["id_jogo", "chutes_cruzeiro", "chutes_adv", "chutes_gol_cruzeiro", "chutes_gol_adv", "chutes_area_cruzeiro", "chutes_area_adv", "chutes_fora_area_cruzeiro", "chutes_fora_area_adv"]], on="id_jogo", how="inner")
 
     #REMOVENDO ESPAÇOS EM COLUNAS STRING
-    for col in df_chutes.select_dtypes(include=["object", "string"]):
-        df_chutes[col] = df_chutes[col].str.strip()
+    df_chutes = remover_espacos(df=df_chutes)
     
     #CRIANDO UM FILTRO NOS FILTROS
-    competicoes, mando = filtro_comp_mando(c=competicoes, m=mando)
-    df_chutes = df_chutes[(df_chutes["competicao"].isin(competicoes)) & (df_chutes["mando"].isin(mando))]
+    df_chutes = filtro_comp_mando(c=competicoes, m=mando, df=df_chutes)
     df_chutes["chutes_nao_gol_cruzeiro"] = df_chutes["chutes_cruzeiro"] - df_chutes["chutes_gol_cruzeiro"]
     df_chutes["chutes_nao_gol_adv"] = df_chutes["chutes_adv"] - df_chutes["chutes_gol_adv"]
 
@@ -278,5 +269,53 @@ def perfil_finalizacoes(competicoes=[], mando=[]):
     return fig1, fig2, fig3, fig4
     
 
+def passes_trocados(competicoes=[], mando=[]):
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import numpy as np
 
-perfil_finalizacoes()
+    #TABELAS QUE SERÃO USADAS
+    df_jogos = pd.read_excel("jogos.xlsx")
+    df_ataque = pd.read_excel("ataque.xlsx")
+
+    #JUNÇÃO DOS DFs
+    df_passes = pd.merge(df_jogos[["id_jogo", "adversario", "competicao", "mando"]], df_ataque[["id_jogo", "passes_cruzeiro", "passes_certos_cruzeiro", "passes_adv", "passes_certos_adv"]], on="id_jogo", how="inner")
+
+    #REMOVENDO ESPAÇOS
+    df_passes = remover_espacos(df=df_passes)
+
+    #FILTRO DE COMPETIÇÕES E MANDOS
+    df_passes = filtro_comp_mando(c=competicoes, m=mando, df=df_passes)
+
+    #DECLARAÇÃO DAS VARIÁVEIS QUE SERÃO USADAS
+    x = df_passes["id_jogo"]
+    passes_cruzeiro = df_passes["passes_cruzeiro"]
+    passes_certos_cruzeiro = df_passes["passes_certos_cruzeiro"]
+    passes_adv = df_passes["passes_adv"]
+    passes_certos_adv = df_passes["passes_certos_adv"]
+
+    #GRÁFICOS DE LINHAS
+    fig1, ax1 = plt.subplots(figsize=(10,5))
+
+    ax1.plot(x, passes_cruzeiro, label="Passes Cruzeiro", marker="o", color="darkblue")
+    ax1.plot(x, passes_adv, label="Passes Adversário", marker="o", color="lightblue")
+
+    ax1.set_title("Passes Trocados Por Jogo")
+    ax1.legend()
+    ax1.grid(True)
+
+    fig2, ax2 = plt.subplots(figsize=(10,5))
+
+    ax2.plot(x, passes_certos_cruzeiro, label="Passes Certos Cruzeiro", marker="o", color="darkblue")
+    ax2.plot(x, passes_certos_adv, label="Passes Certos Adversários", marker="o", color="lightblue")
+
+    ax2.set_title("Passes Certos Por Jogo")
+    ax2.legend()
+    ax2.grid(True)
+
+    return fig1, fig2
+    
+
+    
+
+
