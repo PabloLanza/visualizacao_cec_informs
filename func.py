@@ -212,11 +212,50 @@ def participacoes(competicoes=[], mando=[]):
     df_participacoes = df_participacoes[~df_participacoes["jogador"].isin(["NONE", "PÊNALTI", "FALTA"])]
 
     return df_participacoes.sort_values(by="participacoes", ascending=False)    
-
-
     
     
+def perfil_finalizacoes(competicoes=[], mando=[]):
 
+    import pandas as pd
+    import matplotlib.pyplot as plt
 
+    #TABELAS QUE SERÃO USADAS
+    df_jogos = pd.read_excel("jogos.xlsx")
+    df_ataque = pd.read_excel("ataque.xlsx")
 
+    #JUNÇÃO DOS DFs
+    df_chutes = pd.merge(df_jogos[["id_jogo", "competicao", "mando"]], df_ataque[["id_jogo", "chutes_cruzeiro", "chutes_adv", "chutes_gol_cruzeiro", "chutes_gol_adv", "chutes_area_cruzeiro", "chutes_area_adv", "chutes_fora_area_cruzeiro", "chutes_fora_area_adv"]], on="id_jogo", how="inner")
+
+    #REMOVENDO ESPAÇOS EM COLUNAS STRING
+    for col in df_chutes.select_dtypes(include=["object", "string"]):
+        df_chutes[col] = df_chutes[col].str.strip()
     
+    #CRIANDO UM FILTRO NOS FILTROS
+    competicoes, mando = filtro_comp_mando(c=competicoes, m=mando)
+    df_chutes = df_chutes[(df_chutes["competicao"].isin(competicoes)) & (df_chutes["mando"].isin(mando))]
+
+    df_chutes_sum = df_chutes[["chutes_cruzeiro", "chutes_adv", "chutes_gol_cruzeiro", "chutes_gol_adv", "chutes_area_cruzeiro", "chutes_area_adv", "chutes_fora_area_cruzeiro", "chutes_fora_area_adv"]].sum().reset_index()
+    df_chutes_sum.columns = ["stats", "soma"]
+    df_chutes_sum["media"] = round(df_chutes_sum["soma"] / len(df_chutes), 0)
+
+    df_chutes_sum = df_chutes_sum.set_index("stats")
+
+    #GRAFICO PIZZA CHUTES DENTRO E FORA AREA
+    valores1 = df_chutes_sum.loc[["chutes_area_cruzeiro", "chutes_fora_area_cruzeiro"], "soma"]
+    valores2 = df_chutes_sum.loc[["chutes_area_adv", "chutes_fora_area_adv"], "soma"]
+
+    fig1, ax1 = plt.subplots(1, 2, figsize=(12, 7))
+    ax1[0].pie(valores1, 
+            labels=["Dentro da Área", "Fora da Área"], autopct="%.1f%%", startangle=90, colors=["#427ef5", "#f5ba67"])
+    ax1[0].set_title("Perfil das Finalizações do Cruzeiro", color="#427ef5", fontweight="bold", fontsize=14)
+
+    ax1[1].pie(valores2,
+            labels=["Dentro da Área", "Fora da Área"], autopct="%.1f%%", startangle=90, colors=["#427ef5", "#f5ba67"])
+    ax1[1].set_title("Perfil das Finalizações do Adversário", color="#427ef5", fontweight="bold", fontsize=14)
+    plt.tight_layout()
+
+    return fig1
+    
+
+
+perfil_finalizacoes()
