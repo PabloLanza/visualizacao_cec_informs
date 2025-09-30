@@ -270,6 +270,7 @@ def perfil_finalizacoes(competicoes=[], mando=[]):
     
 
 def passes_trocados(competicoes=[], mando=[]):
+
     import pandas as pd
     import matplotlib.pyplot as plt
     import numpy as np
@@ -320,6 +321,110 @@ def passes_trocados(competicoes=[], mando=[]):
     return fig1, fig2
     
 
+def normalizar(val):
+    import pandas as pd
+    import numpy as np
+
+    #CASO 1 - LISTA JÁ PRONTA
+    if isinstance(val, list):
+        return [int(x) for x in val if x not in [0, None] and not pd.isna(x)]
     
+    elif isinstance(val, str):
+        return [int(x) for x in val.split(", ") if x.strip() not in ["", "0"]]
+
+    elif pd.notna(val) and val != 0:
+        return [int(val)]
+    
+    else:
+        return []
+
+
+def minutos_gols(competicoes=[], mando=[]):
+
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    #TABELAS QUE SERÃO USADAS
+    df_esc = pd.read_excel("escalacoes.xlsx")
+    df_jogos = pd.read_excel("jogos.xlsx")
+
+    #JUNÇÃO DOS DFs
+    df_min = pd.merge(df_esc[["id_jogo", "minutos_gols_pro", "minutos_gols_contra"]], 
+                      df_jogos[["id_jogo", "competicao", "mando"]], on="id_jogo", how="inner")
+
+    #REMOVENDO ESPAÇOS
+    df_min[["competicao", "mando"]] = remover_espacos(df=df_min[["competicao", "mando"]])
+
+    #APLICANDO FILTROS
+    df_min = filtro_comp_mando(c=competicoes, m=mando, df=df_min)
+
+    #REMOVENDO AS COLUNAS QUE NÃO SERÃO USADAS
+    df_min = df_min[["minutos_gols_pro", "minutos_gols_contra"]]
+
+    #TRANSFORMANDO AS COLUNAS EM LISTAS
+    lista_min_gols_pro = df_min["minutos_gols_pro"].apply(normalizar)
+    lista_min_gols_contra = df_min["minutos_gols_contra"].apply(normalizar)
+
+    #CONCATENANDO TUDO EM UMA SÓ LISTA
+    lista_min_gols_pro = [x for sublist in lista_min_gols_pro for x in sublist]
+    lista_min_gols_contra = [x for sublist in lista_min_gols_contra for x in sublist]
+    
+    #DEFININDO OS INTERVALOS
+    bins = list(range(0, 100, 11))
+
+    #CRIAR OS RÓTULOS DOS INTERVALOS
+    labels = [f"{bins[i]}-{bins[i+1]}" for i in range(len(bins)-1)]
+
+    #TRANFORMANDO EM SERIES
+    s = pd.Series(lista_min_gols_pro)
+    s1 = pd.Series(lista_min_gols_contra)
+
+    #CONTANDO A QUANTIDADE POR INTERVALO
+    intervalos_pro = pd.cut(s, bins=bins, labels=labels, right=False).value_counts().sort_index()
+    intervalos_contra = pd.cut(s1, bins=bins, labels=labels, right=False).value_counts().sort_index()
+
+    df_pro = intervalos_pro.reset_index()
+    df_pro.columns = ["intervalo", "gols_pro"]
+
+    df_contra = intervalos_contra.reset_index()
+    df_contra.columns = ["intervalo", "gols_contra"]
+
+    #DF FINAL
+    df_final = pd.merge(df_pro, df_contra, on="intervalo", how="inner")
+
+    #PLOT
+    intervalos = df_final["intervalo"]
+    gols_cruzeiro = df_final["gols_pro"]
+    gols_adv = df_final["gols_contra"]
+
+    #LARGURA DAS BARRAS
+    largura = 0.35
+
+    #POSIÇÕES NO EIXO X
+    x = np.arange(len(intervalos))
+
+    #CRIANDO O GRÁFICO
+    fig, ax = plt.subplots(figsize=(10, 6))
+    barras1 = ax.bar(x - largura/2, gols_cruzeiro, width=largura, color="darkblue", label="Gols do Cruzeiro")
+
+    barras2 = ax.bar(x + largura/2, gols_adv, width=largura, color="#fcba03", label="Gols do Adversário")
+
+    ax.set_title("Gols por Intervalo de Minutos", fontsize=16, color="darkblue", fontweight="bold")
+    ax.set_xlabel("Intervalo (Minutos)", color="darkblue", fontweight="bold")
+    ax.set_ylabel("Gols", color="darkblue", fontweight="bold")
+    ax.set_xticks(x)
+    ax.set_xticklabels(intervalos)
+    ax.legend()
+
+    ax.bar_label(barras1, padding=3)
+    ax.bar_label(barras2, padding=3)
+
+    return fig
+
+
+
+
+
 
 
